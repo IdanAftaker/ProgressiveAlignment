@@ -2,6 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
 public class Main implements ActionListener {
     //===Members===
@@ -9,14 +12,20 @@ public class Main implements ActionListener {
     private JPanel mainPanel;
     private JPanel upperPanel;
     private JPanel buttonsPanel;
+    private JPanel centerPanel;
     private JPanel lowerPanel;
     private JButton btn_AddSequence;
     private JButton btn_Compute;
     private JButton btn_SubMatrix;
 
     private JLabel lblEnterSequences;
+    private JLabel lblScore;
+
     private JTextField textField;
     private JTextField textField_2;
+    private JTextField textField_score;
+
+    private ScrollPane scrollPane;
 
     private int stringCounter = 0;
     private String[] Seqs = new String[10000];
@@ -25,8 +34,14 @@ public class Main implements ActionListener {
     private char[][] matrix = new char[24][3];
 
     //===Methods===
+
+    /**
+     * Main frame and components
+     */
     public Main(){
         this.mainFrame = new JFrame("DNA Progressive Alignment:");
+        mainFrame.setLayout(new BorderLayout());
+
         BorderLayout border = new BorderLayout();
 
         //get the screen resolution for display frame in full screen
@@ -34,6 +49,7 @@ public class Main implements ActionListener {
 
         //Labels
         this.lblEnterSequences = new JLabel("Enter Sequences :");
+        this.lblScore = new JLabel("Score of multiply sequences aligmnet:");
 
 
         //Add buttons
@@ -75,31 +91,64 @@ public class Main implements ActionListener {
         upperPanel.add(textField, border.CENTER);
         upperPanel.add(buttonsPanel, border.SOUTH);
 
+
+        //Center panel
+        this.centerPanel = new JPanel();
+        centerPanel.setLayout(new BorderLayout());
+        txtrD = new JTextArea();
+        txtrD.setFont(new Font("Courier New", Font.BOLD, 14));
+
+        this.scrollPane = new ScrollPane();
+//        scrollPane.setLayout(new GroupLayout());
+//        scrollPane.setViewportView(txtrD);
+        scrollPane.add(txtrD);
+        centerPanel.add(scrollPane);
+
+
         //Lower panel
         this.lowerPanel = new JPanel();
-        lowerPanel.setLayout(new BorderLayout());
+        lowerPanel.setLayout(new GridLayout());
+        lowerPanel.add(lblScore);
+//        this.textField_score = new JTextField();
+//        lowerPanel.add(textField_score, 1);
+        this.textField_2 = new JTextField();
+        textField_2.setSize(100, 1000);
+        lowerPanel.add(textField_2);
+
+
+
 
         //Main panel of the screen
         this.mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.white);
         mainPanel.add(upperPanel,border.NORTH);
+        mainPanel.add(centerPanel,border.CENTER);
         mainPanel.add(lowerPanel, border.SOUTH);
 
-
+        //Add panels to main frame
+        mainFrame.add(mainPanel);
+        mainFrame.pack();
 
         this.mainFrame.setBounds(0,0,(int)screenSize.getWidth(),(int)screenSize.getHeight());
+//        this.mainFrame.pack();
         this.mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.mainFrame.setVisible(true);
 
 
-        //Add panels to main frame
-        mainFrame.add(mainPanel);
+
+
 
     }
 
+    /**
+     * Action listener for the buttons
+     * @param e
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == btn_AddSequence){
+//            this.txtrD = new JTextArea();
             Seqs[stringCounter]=textField.getText();
             txtrD.append(Seqs[stringCounter]+"\n");
             CenterStar.sequence[stringCounter]=Seqs[stringCounter];
@@ -113,16 +162,34 @@ public class Main implements ActionListener {
             else{
                 this.txtrD = new JTextArea();
                 txtrD.setText(CenterStar.compute(matrix,stringCounter));
-                this.textField_2 = new JTextField();
                 textField_2.setText(String.valueOf(CenterStar.totalScore));
             }
         }
         if (e.getSource() == btn_SubMatrix){
-            // TODO: 03/01/2017
+            JFileChooser fs = new JFileChooser(new File("c:\\"));
+            fs.setDialogTitle("Open a File");
+            fs.showOpenDialog(null);
+            File fi =fs.getSelectedFile();
+            try {
+                BufferedReader br = new BufferedReader(new FileReader(fi.getPath()));
+                String line ="";
+                while((line = br.readLine())!= null){
+                    file+=line;
+                }
+                if(br !=null)
+                    br.close();
+
+            } catch (Exception e1) {
+                JOptionPane.showMessageDialog(null, e1.getMessage());
+            }
+            initMatrix();
         }
 
     }
 
+    /**
+     * initilatize the matrix
+     */
     private void initMatrix(){
         file=file.replace(" ", "");
         for(int i=0;i<24;i++){
@@ -130,6 +197,10 @@ public class Main implements ActionListener {
         }
     }
 
+    /**
+     * main function
+     * @param args
+     */
     public static void main(String[] args) {
         Main window = new Main();
     }
