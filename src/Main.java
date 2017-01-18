@@ -7,6 +7,12 @@ import java.io.File;
 import java.io.FileReader;
 
 public class Main implements ActionListener {
+
+    public static String str1 = "AATCGATCGGATCGACTGATTCAGATGTACGCATCGTAGCCATGTGGCTACTAACCGCCTAGCACGACGGTATTTAGCTG";
+    public static String str2 = "AATCGATCGGATCGACTGATTCAGATGTACGCATCGTAGCCATGTGGCTACTAACCGCCTAGCACGACGGTAGTCGATTT";
+//public static String str1 = "ABCDE";
+//public static String str2 = "DEFGACABC";
+    public ProgressiveAlignment obj;
     //===Members===
     private JFrame mainFrame;
     private JPanel mainPanel;
@@ -17,6 +23,7 @@ public class Main implements ActionListener {
     private JButton btn_AddSequence;
     private JButton btn_Compute;
     private JButton btn_SubMatrix;
+    private JButton btn_ProgressiveAlli;
 
     private JLabel lblEnterSequences;
     private JLabel lblScore;
@@ -39,6 +46,7 @@ public class Main implements ActionListener {
      * Main frame and components
      */
     public Main(){
+
         this.mainFrame = new JFrame("DNA Progressive Alignment:");
         mainFrame.setLayout(new BorderLayout());
 
@@ -68,7 +76,9 @@ public class Main implements ActionListener {
         btn_SubMatrix.setFont(new Font("Helvetica",Font.ITALIC,14));
         btn_SubMatrix.addActionListener(this);
 
-
+        this.btn_ProgressiveAlli = new JButton("ProgressiveAlignment");
+        btn_ProgressiveAlli.setFont(new Font("Helvetica",Font.ITALIC,14));
+        btn_ProgressiveAlli.addActionListener(this);
 
         //Buttons Panel
         this.buttonsPanel = new JPanel();
@@ -76,6 +86,7 @@ public class Main implements ActionListener {
         buttonsPanel.add(btn_AddSequence);
         buttonsPanel.add(btn_SubMatrix);
         buttonsPanel.add(btn_Compute);
+        buttonsPanel.add(btn_ProgressiveAlli);
 
         //Text field
         this.textField = new JTextField();
@@ -131,13 +142,8 @@ public class Main implements ActionListener {
         mainFrame.pack();
 
         this.mainFrame.setBounds(0,0,(int)screenSize.getWidth(),(int)screenSize.getHeight());
-//        this.mainFrame.pack();
         this.mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.mainFrame.setVisible(true);
-
-
-
-
 
     }
 
@@ -153,7 +159,6 @@ public class Main implements ActionListener {
             txtrD.append(Seqs[stringCounter]+"\n");
             CenterStar.sequence[stringCounter]=Seqs[stringCounter];
             stringCounter++;
-
             textField.setText(">");
         }
         if (e.getSource() == btn_Compute){
@@ -184,7 +189,9 @@ public class Main implements ActionListener {
             }
             initMatrix();
         }
-
+        if (e.getSource() == btn_ProgressiveAlli){
+            this.obj = new ProgressiveAlignment(str1, str2);
+        }
     }
 
     /**
